@@ -110,5 +110,13 @@ describe('restaurants route', () => {
       .post('/api/v1/restaurants/1/reviews')
       .send({ stars: 4, detail: 'clams were cold' });
     expect(res.status).toBe(200);
+    expect(res.body).toMatchInlineSnapshot(`
+      Object {
+        "detail": "clams were cold",
+        "id": "4",
+        "restaurant_id": "1",
+        "stars": 4,
+      }
+    `);
   });
 });
