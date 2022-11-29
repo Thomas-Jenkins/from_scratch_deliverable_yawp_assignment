@@ -2,6 +2,14 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
+const UserService = require('../lib/services/UserService');
+
+const mockUser = {
+  firstName: 'Test',
+  lastName: 'User',
+  email: 'test@example.com',
+  password: '12345',
+};
 
 describe('restaurants route', () => {
   beforeEach(() => {
@@ -85,5 +93,22 @@ describe('restaurants route', () => {
         "website": "http://www.PipsOriginal.com",
       }
     `);
+  });
+
+  const registerAndLogin = async () => {
+    const agent = request.agent(app);
+    const user = await UserService.create(mockUser);
+    await agent
+      .post('/api/v1/users/sessions')
+      .send({ email: mockUser.email, password: mockUser.password });
+    return [agent, user];
+  };
+
+  it('POST api/v1/restaurants/:id/reviews', async () => {
+    const [agent] = await registerAndLogin();
+    const res = await agent
+      .post('/api/v1/restaurants/1/reviews')
+      .send({ stars: 4, detail: 'clams were cold' });
+    expect(res.status).toBe(200);
   });
 });
